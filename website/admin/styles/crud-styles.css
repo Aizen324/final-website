@@ -1,0 +1,357 @@
+/* MODAL DESIGN */
+.adoption-modal-overlay,
+.rehome-modal-overlay {
+  height: 100vh;
+  width: 100%;
+  position: fixed;
+  left: auto;
+  top: auto;
+  background-color: var(--shadow-clr);
+  backdrop-filter: blur(2px);
+  z-index: 1000;
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.close-btn {
+  cursor: pointer;
+}
+
+.adoption-modal-overlay h3,
+.rehome-modal-overlay h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.update-modal {
+  width: 80%;
+  max-width: 900px;
+  max-height: 90vh;
+
+  background-color: var(--white-clr);
+  border-radius: 12px;
+
+  padding: 25px;
+  overflow-y: auto;
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.update-modal .modal-info form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px 20px;
+}
+
+.update-modal .modal-info form div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.update-modal .modal-info form div input,
+.update-modal .modal-info form div select,
+.update-modal .modal-info form div textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.update-modal textarea {
+  min-height: 80px;
+  overflow-y: scroll;
+  resize: none;
+}
+
+.edit-icon {
+  width: 15px;
+}
+
+.modal-action {
+  grid-column: span 2;
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 10px;
+}
+  .modal-action button {
+    font-size: 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 10px;
+    background-color: var(--yellow-primary-clr);
+    color: var(--black-clr);
+    border: 1.5px solid var(--yellow-primary-clr);
+    border-radius: 20px;
+    transition: all 0.3s ease-in-out;
+  }
+  .modal-action button:nth-child(2) {
+    background-color: transparent;
+    color: var(--black-clr);
+    border: 1.5px solid var(--black-clr);
+  }
+  .modal-action button:hover {
+    background-color: var(--teal-clr);
+    color: var(--white-clr);
+    border: 1.5px solid var(--teal-clr)
+  }
+
+/* =============== */
+
+/* MAIN CONTENT */
+.section-1,
+.section-2,
+.section-3
+{
+  height: 100vh;
+  width: 100%;
+  background: 
+    linear-gradient(rgba(255, 255, 255, 0.497)),
+    url('../../images/paw-pattern-bg.png') center/contain repeat;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.adoption-wrapper,
+.rehoming-wrapper,
+.user-wrapper {
+  width: 90%;
+  height: 65vh;
+}
+
+.table-scroll {
+  width: 100%;
+  height: 100%;
+  background: white;
+  overflow: auto;
+  border: 3px solid var(--teal-clr);
+}
+
+.adoption-table,
+.rehoming-table,
+.user-table
+{
+  min-width: 1200px;
+  padding: 10px;
+  height: max-content;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow: visible;
+}
+
+.adoption-table .row,
+.rehoming-table .row,
+.user-table .row
+{
+  min-width: max-content;
+  min-height: 40px;
+  display: grid;
+  grid-template-columns: 
+    180px 180px 80px 120px 160px 100px 300px 140px 120px 170px 140px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--teal-clr);
+  text-align: center;
+  font-size: 14px;
+}
+  /* Override Grid Columns */
+  .user-table .row.user {
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  }
+
+  .adoption-table .row.update {
+    grid-template-columns: 
+      180px 180px 80px 120px 160px 100px 300px 140px 120px 170px 140px 130px;
+  }
+  .rehoming-table .row {
+    grid-template-columns: 
+      150px 80px 120px 100px 100px 230px 120px 150px 120px 230px 160px 130px;
+  }
+
+.adoption-table .row:first-child,  
+.rehoming-table .row:first-child,
+.user-table .row:first-child
+{
+  border: none;
+}
+
+.adoption-table .row:first-child p,
+.rehoming-table .row:first-child p,
+.user-table .row:first-child p
+{
+  font-size: 12.5px;
+  text-align: center;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.pet_desc,
+.reason {
+  max-height: 50px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+/* SCROLLBAR DESIGN */
+.table-scroll::-webkit-scrollbar,
+.pet_desc::-webkit-scrollbar,
+.reason::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.table-scroll::-webkit-scrollbar-track,
+.pet_desc::-webkit-scrollbar-track,
+.reason::-webkit-scrollbar-track {
+  background: var(--white-clr);
+}
+
+.table-scroll::-webkit-scrollbar-thumb,
+.pet_desc::-webkit-scrollbar-thumb,
+.reason::-webkit-scrollbar-thumb {
+  background: var(--teal-clr);
+  border-radius: 10px;
+}
+/* ============================== */
+
+/* CREATE PAGE FORM */
+.section-1 .form-container {
+  width: 100%;
+  height: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 100px;
+  
+}
+.form-container .header-text {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+.form-container form {
+  position: relative;
+  background-color: white;
+  border: 3px solid var(--teal-clr);
+  border-radius: 20px;
+  padding: 20px;
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+  #paw-img {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 120px;
+  }
+/* ============================== */
+
+
+/* CREATE PAGE INPUTS */
+.input-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 20px;
+}
+.input-wrapper p {
+  flex: 1;
+  text-align: left;
+}
+.input-wrapper input,
+.input-wrapper textarea,
+.input-wrapper select {
+  flex: 2;
+  padding: 5px;
+  border: 1px solid rgb(173, 173, 173);
+}
+textarea {
+  min-height: 100px;
+  max-height: 100px;
+  font-size: 13px;
+  font-weight: 400;
+}
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border: 1px solid var(--teal-clr);
+}
+/* ============================== */
+
+
+/* CREATE BUTTON */
+.add-btn {
+  width: 200px;
+  padding: 10px;
+  margin-top: 30px;
+  text-transform: uppercase;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--black-clr);
+  background-color: var(--yellow-primary-clr);
+  border: 2px solid var(--yellow-primary-clr);
+  border-radius: 30px;
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+}
+.add-btn:hover {
+  color: var(--teal-clr);
+  background-color: var(--white-clr);
+  border: 2px solid var(--teal-clr);
+}
+
+/* UPDATE BUTTON */
+.adopt-update-btn,
+.rehome-update-btn,
+.delete-btn {
+  width: 100%;
+  height: 25px;
+  border: none;
+  border-radius: 20px;
+  font-weight: 700;
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+.adopt-update-btn,
+.rehome-update-btn {
+  color: var(--white-clr);
+  background-color: var(--teal-clr);
+}
+
+.delete-btn {
+  color: var(--white-clr);
+  background-color: var(--error-delete-clr);
+}
+
+.adopt-update-btn:hover,
+.rehome-update-btn:hover {
+  background-color: var(--white-clr);
+  color: var(--teal-clr);
+  border: 2px solid var(--teal-clr);
+}
+
+.delete-btn:hover {
+  background-color: var(--white-clr);
+  color: var(--error-delete-clr);
+  border: 2px solid var(--error-delete-clr);
+}

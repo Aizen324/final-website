@@ -1,0 +1,471 @@
+/* ── SECTION 1 OF ADOPTION ── */
+.adoption-section-1 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 60vh;
+  background: 
+    linear-gradient(rgba(255, 255, 255, 0.497)),
+    url('../../images/paw-pattern-bg.png') center/contain repeat;
+  text-align: center;
+  box-shadow: 0 1px 10px var(--shadow-clr);
+}
+.adoption-section-1 h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+  color: var(--teal-clr);
+}
+.adoption-section-1 p {
+  font-size: 1.1rem;
+  line-height: 2;
+  max-width: 700px;
+  color: var(--black-clr);
+}
+
+/* ── SECTION 2 OF ADOPTION ── */
+.adoption-section-2 {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 40px;
+  padding: 40px 60px;
+  min-height: 70vh;
+}
+
+/* ── SEARCH BAR ── */
+.search-bar-wrap {
+  width: 100%;
+  filter: drop-shadow(4px 3px 1px #ccc);
+}
+.search-bar {
+  display: flex;
+  border: 1.5px solid #ccc;
+  border-radius: 30px;
+  overflow: hidden;
+  background: #fff;
+}
+.search-input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 10px;
+  border-right: 1.5px solid #ccc;
+}
+.search-icon {
+  font-size: 16px;
+  color: #666;
+}
+.search-input-wrap input {
+  border: none;
+  outline: none;
+  font-size: 14px;
+  width: 100%;
+  padding: 12px 0;
+}
+.filter-select {
+  border: none;
+  outline: none;
+  padding: 0 20px;
+  font-size: 14px;
+  background: #fff;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  min-width: 110px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23333' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+.filter-select:not(:last-child) {
+  border-right: 1.5px solid #ccc;
+}
+
+/* ── PET GRID ── */
+.pet-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.pet-card {
+  border: 1.5px solid #ccc;
+  filter: drop-shadow(1px 1px 3px #ccc);
+  border-radius: 6px;
+  overflow: hidden;
+  background: #FFFDE4;
+  display: flex;
+  flex-direction: column;
+}
+.pet-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+.pet-card-img-placeholder {
+  width: 100%;
+  height: 180px;
+  background: #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.pet-card-img-placeholder img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.pet-card-body {
+  padding: 12px 14px 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.pet-card-info {
+  position: relative;
+}
+.gender-icon {
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: 20px;
+}
+.Male, .male {
+  color: #1a9bdb;
+  font-size: 2rem;
+}
+.Female, .female {
+  color: #e040cc;
+  font-size: 2rem;
+}
+.pet-card-info p {
+  font-size: 0.9rem;
+  line-height: 1.9;
+  color: #111;
+}
+.pet-card-info p span.label {
+  margin-right: 4px;
+}
+
+.no-pet {
+  text-align: center;
+}
+.btn-learn,
+.btn-details {
+  align-self: flex-end;
+  margin-top: 14px;
+  background: #F5C842;
+  border: none;
+  padding: 12px 25px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 20px;
+  text-transform: uppercase;
+  transition: all 0.3s ease-in-out;
+}
+
+.btn-learn:hover,
+.btn-details:hover {
+  background: var(--teal-clr);
+  color: var(--white-clr);
+  filter: drop-shadow(1px 3px 2px var(--shadow-clr));
+}
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+  color: #888;
+  font-size: 15px;
+}
+
+/* ── REHOME PAGE ── */
+
+/* ── REHOME SECTION 1 ── */
+.rehome-section-1 {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 60vh;
+  background: 
+    linear-gradient(rgba(255, 255, 255, 0.497)),
+    url('../../images/paw-pattern-bg.png') center/contain repeat;
+  text-align: center;
+  box-shadow: 0 1px 10px var(--shadow-clr);
+}
+.rehome-section-1 h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+  color: var(--teal-clr);
+}
+.rehome-section-1 p {
+  font-size: 1.1rem;
+  line-height: 2;
+  color: var(--black-clr);
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* ── REHOME SECTION 2 ── */
+.rehome-section-2 {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 40px;
+  padding: 40px 60px;
+  min-height: 70vh;
+}
+.section-title-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.section-title-divider::before,
+.section-title-divider::after {
+  content: '';
+  flex: 1;
+  height: 1.5px;
+  background: var(--teal-clr);
+}
+.section-title-divider span {
+  font-size: 16px;
+  color: var(--teal-clr);
+  white-space: nowrap;
+}
+.rehome-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.rehome-card {
+  border: 1.5px solid #ccc;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--white-clr);
+  display: flex;
+  flex-direction: column;
+}
+.add-card {
+  border: 1.5px solid #ccc;
+  border-radius: 6px;
+  background: #FFFDE4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 280px;
+  cursor: pointer;
+  gap: 16px;
+  transition: background .2s;
+}
+.add-card:hover {
+  background: #f5f0c0;
+}
+.add-card-title {
+  font-size: 18px;
+  color: #333;
+}
+.add-plus {
+  font-size: 48px;
+  color: #333;
+  line-height: 1;
+  font-weight: 300;
+}
+.status-verified {
+  color: var(--teal-clr);
+}
+.status-unverified {
+  color: #f83e3e;
+}
+
+/* ── PET DETAILS OVERLAY MODAL ── */
+.details-overlay {
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  left: auto;
+  top: auto;
+  background-color: var(--shadow-clr);
+  backdrop-filter: blur(2px);
+  z-index: 1000;
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+.close-btn {
+  font-size: 1.3rem;
+  color: var(--white-clr);
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+}
+.details-modal {
+  position: relative;
+  padding: 12px;
+  height: 60%;
+  width: 50%;
+  background-color: var(--white-clr);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow: hidden;
+  border-radius: 15px;
+}
+.details-modal::before {
+  content: '';
+  position: absolute;
+  top: 7px;
+  left: 0;
+  z-index: 1;
+  height: 40px;
+  width: 100%;
+  background: linear-gradient(to left, var(--teal-clr), #03bdbd, var(--teal-clr));
+  opacity: 0.8;
+}
+.details-modal .modal-name-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+}
+.details-modal .modalName {
+  text-align: center;
+  margin-top: 5px;
+  color: var(--black-clr);
+}
+.details-modal #line-decor {
+  width: 30%;
+}
+.details-modal #teal-paw {
+  width: 120%;
+  opacity: 0.6;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  transform: translate(40%, 30%) rotate(-20deg);
+  pointer-events: none;
+}
+.details-modal #paws-side-pattern {
+  width: 60%;
+  opacity: 0.3;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+}
+.details-modal .modal-info {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 10px;
+}
+.details-modal .modal-info p {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+.details-modal .modal-info b {
+  width: 160px;
+}
+.details-modal .modal-info span {
+  display: flex;
+  align-items: center;
+  width: 300px;
+  min-height: 40px;
+  position: relative;
+}
+.details-modal .modal-info .modalDesc {
+  display: block;
+  max-height: 40px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  white-space: pre-wrap;
+}
+  .modalDesc::-webkit-scrollbar {
+    width: 5px;
+  }
+  .modalDesc::-webkit-scrollbar-track {
+    background-color: var(--black-clr);
+    border-radius: 20px;
+  }
+  .modalDesc::-webkit-scrollbar-thumb {
+    background-color: var(--lightblue-clr);
+    border-radius: 20px;
+    transition: all 0.3s ease-in-out;
+  }
+  .modalDesc::-webkit-scrollbar-thumb:hover {
+    background-color: var(--teal-clr);
+  }
+
+.details-modal .modal-info p::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 160px;
+  width: 300px;
+  border-bottom: 1.5px solid var(--teal-clr);
+}
+
+/* ── ADOPT AND REHOME SECTION 3 ── */
+.section-3 {
+  width: 100%;
+  height: 15vh;
+  margin-top: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.section-3 .wrapper {
+  width: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+.wrapper .text-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 30px;
+}
+.section-3 p {
+  font-size: 1.1rem;
+}
+.section-3 button {
+  background: var(--yellow-primary-clr);
+  color: var(--black-clr);
+  border: none;
+  padding: 12px 25px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 20px;
+  text-transform: uppercase;
+  transition: all 0.3s ease-in-out;
+}
+.section-3 button:hover {
+  background: var(--teal-clr);
+  color: var(--white-clr);
+}
+.section-3 #dog-house,
+.section-3 #running-dog {
+  width: 15%;
+  pointer-events: none;
+}
