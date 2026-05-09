@@ -21,11 +21,17 @@
       $ownerName = mysqli_real_escape_string($connection, $_POST["owner_name"]);
       $contact   = mysqli_real_escape_string($connection, $_POST["contact_num"]);
       $reason    = mysqli_real_escape_string($connection, $_POST["reason"]);
-      
+
+      $imageName = $_FILES['pet_image']['name'];
+      $imageTemp = $_FILES['pet_image']['tmp_name'];
+      $newImageName = time() . '_' . $imageName;
+      $uploadPath = '../../uploads/' . $newImageName;
+      move_uploaded_file($imageTemp, $uploadPath);
+
       $insert_query = 
-        "INSERT INTO rehoming_listings (pet_name, age, type, gender, breed, pet_desc, owner_name, contact_no, reason, user_id) 
+        "INSERT INTO rehoming_listings (pet_name, age, type, gender, breed, pet_image, pet_desc, owner_name, contact_no, reason, user_id) 
         VALUES 
-          ('$petName', '$age', '$type', '$gender', '$breed', '$petDesc', '$ownerName', '$contact', '$reason', '$user_id')";
+          ('$petName', '$age', '$type', '$gender', '$breed', '$newImageName', '$petDesc', '$ownerName', '$contact', '$reason', '$user_id')";
       
       mysqli_query($connection, $insert_query);
       header('Location: rehoming-page.php');
@@ -58,7 +64,7 @@
     </section>
 
     <section class="section-2">
-      <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+      <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" enctype="multipart/form-data">
             
         <div class="line"></div>
         <div class="form1-container">
@@ -92,19 +98,34 @@
           <div class="wrapper">
             <p>Type <span>*</span></p>
             <div class="input-wrapper">
-              <input type="text" placeholder="e.g. Cat" class="user-input" name="type" required>
+              <select name="type" class="user-input" id="petType" required>
+                <option value="" disabled selected>Select pet type</option>
+                <option value="Dog">Dog</option>
+                <option value="Cat">Cat</option>
+                <option value="Bird">Bird</option>
+                <option value="Rabbit">Rabbit</option>
+              </select>
             </div>
           </div>
 
           <div class="wrapper">
             <p>Breed <span>*</span></p>
             <div class="input-wrapper">
-              <input type="text" class="user-input" name="breed" required>
+              <select name="breed" class="user-input" id="petBreed" required>
+                <option value="" disabled selected>Select pet breed</option>
+              </select>
             </div>
           </div>
 
           <div class="wrapper">
-            <p>Description <span>*</span></p>
+            <p>Image <span>*</span></p>
+            <div class="input-wrapper">
+              <input type="file" class="user-input" name="pet_image" accept="image/*" required>
+            </div>
+          </div>
+
+          <div class="wrapper">
+            <p>Pet Description <span>*</span></p>
             <textarea class="description-input user-input" maxlength="700" name="pet_desc" required></textarea>
           </div>
         </div>
@@ -141,7 +162,32 @@
       </form>
     </section>
   </main>
+  
+  <script defer>
+    const petType = document.getElementById('petType');
+    const breedSelect = document.getElementById('petBreed');
+    const breeds = {
+      Dog: ['Unknown', 'German Shepherd', 'Siberian Husky', 'Aspin', 'Labrador', 'Golden Retriever', 'Pug', 'Chihuahua', 'Terrier', 'Shiba Inu', 'Bulldog'],
+      Cat: ['Unknown', 'Maine Coon', 'British Shorthair', 'Siamese', 'Scottish Fold', 'Puspin'],
+      Bird: ['Unknown', 'Parrot', 'Cockatiel', 'Lovebird', 'Dove', 'Macaw'],
+      Rabbit: ['Unknown', 'Lionhead', 'Mini Rex', 'Netherland Dwarf', 'English Angora', 'Californian']
+    }
 
+    petType.addEventListener('change', () => {
+      const selectedType = petType.value;
+      
+      breedSelect.innerHTML = '<option value="" disabled selected>Select pet breed</option>';
+
+      breeds[selectedType].forEach(breed => {
+        const option = document.createElement('option');
+
+        option.value = breed;
+        option.textContent = breed;
+
+        breedSelect.appendChild(option);
+      });
+    });
+  </script>
   <script src="../scripts/navigation.js" defer></script>
   </body>
 </html>

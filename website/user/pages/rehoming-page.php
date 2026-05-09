@@ -12,7 +12,7 @@
 
   try {
     $get_query = 
-        "SELECT pet_name, age, gender, type, breed, pet_desc, rehoming_status
+        "SELECT pet_name, age, gender, type, breed, pet_image, pet_desc, rehoming_status
         FROM rehoming_listings
         WHERE user_id = $user_id";
 
@@ -144,7 +144,7 @@
           <?php foreach($listings as $listing): ?>
             <div class="rehome-card">
               <div class="pet-card-img-placeholder">
-                <img src="../../images/pet.png" alt="Pet placeholder image">
+                <img src="../../uploads/<?php echo $listing['pet_image']; ?>" alt="Pet placeholder image">
               </div>
 
               <div class="pet-card-body">

@@ -67,7 +67,7 @@ form {
   .form1-container,
   .form2-container {
     width: 90%;
-    height: 80vh;
+    height: 100vh;
     background-color: var(--white-clr);
     box-shadow: 2px 3px 10px var(--shadow-clr);
     border-radius: 10px;
@@ -95,19 +95,22 @@ form {
     width: 400px;
     padding: 5px;
     font-size: 1rem;
+    background-color: #fff;
+    border: 1px solid #6a6a6a;
+    
   }
-  .form1-container .wrapper:nth-child(7),
+  .form1-container .wrapper:nth-child(8),
   .form2-container .wrapper:nth-child(4) {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
-  .form1-container .wrapper:nth-child(7) p,
+  .form1-container .wrapper:nth-child(8) p,
   .form2-container .wrapper:nth-child(4) p {
     width: 100%;
   }
-  .form1-container .wrapper:nth-child(7) textarea,
+  .form1-container .wrapper:nth-child(8) textarea,
   .form2-container .wrapper:nth-child(4) textarea {
     width: 100%;
     height: 150px;
