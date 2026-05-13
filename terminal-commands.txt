@@ -1,0 +1,22 @@
+=========  DOCKER COMMANDS ========= 
+
+docker build -t tailmates-app:v1 .
+docker images
+docker rm
+
+========= KUBERNETES COMMANDS ========= 
+
+kubectl get pods -o wide -n tailmates
+kubectl get svc -n tailmates
+
+APPLY BY NUMBER
+1. kubectl apply -f tailmates_namespace.yaml
+2. kubectl apply -f tailmates-dbinit.yaml
+3. kubectl apply -f mysql_deployment.yaml
+4. kubectl apply -f app-deployment.yaml
+
+
+For testing => kubectl port-forward tailmates-app-69c48dbc49-hh9mb 8080:80 -n tailmates
+
+kubectl delete namespace tailmates
+kubectl delete all --all -n tailmates

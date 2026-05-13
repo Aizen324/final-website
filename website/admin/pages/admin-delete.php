@@ -25,8 +25,9 @@
             <p>{$row['user_email']}</p>
             <p>{$row['role']}</p>
             <p>{$row['register_date']}</p>
-            <form action='admin-delete.php' method='post' onsubmit=\"return confirm('Delete user {$row['user_name']}?')\">
+            <form action='admin-delete.php' method='post' onsubmit=\"return confirm('This action is irreversible. Delete user {$row['user_name']}?')\">
               <input type='hidden' value='{$row['user_id']}' name='user_id'>
+              <input type='hidden' value='{$row['user_name']}' name='user_name'>
               <button type='submit'class='delete-btn'>Delete</button>
             </form>
           </div>
@@ -35,97 +36,86 @@
     }
   }
 
-  function adoptionList($connection) {
+  function petList($connection) {
     $get_query = 
-      "SELECT a.adoption_id, a.pet_name, a.age, a.type, a.breed, a.gender, a.pet_desc, a.owner_name, a.contact_no, a.adoption_status, a.date_listed, u.user_name 
-      FROM adoption_listings a
-      LEFT JOIN users u ON a.user_id = u.user_id";
+      "SELECT pet_id, pet_name, age, type, breed, gender, pet_desc, reason, status, created, updated, user_name
+      FROM pet_profile p
+      LEFT JOIN users u ON p.user_id = u.user_id
+      ORDER BY p.status DESC";
     $result = mysqli_query($connection, $get_query);
     
     if ($result && mysqli_num_rows($result) > 0) {
       while ($row = mysqli_fetch_assoc($result)) {
         echo "
-          <div class='row update'>
-            <p>{$row['owner_name']}</p>
-            <p>{$row['pet_name']}</p>
-            <p>{$row['age']}</p>
-            <p>{$row['type']}</p>
-            <p>{$row['breed']}</p>
-            <p>{$row['gender']}</p>
-            <p class='pet_desc'>{$row['pet_desc']}</p>
-            <p>{$row['contact_no']}</p>
-            <p>{$row['adoption_status']}</p>
-            <p>{$row['date_listed']}</p>
+          <div class='row pet-update'>
+            <p>{$row['status']}</p>
             <p>{$row['user_name']}</p>
-            <form action='admin-delete.php' method='post' onsubmit=\"return confirm('Delete adoption listing?')\">
-              <input type='hidden' value='{$row['adoption_id']}' name='adoption_id'>
-              <button type='submit' class='delete-btn'>Delete</button>
-            </form>
-          </div>
-        ";
-      }
-    }
-  }
-
-  function rehomingList($connection) {
-    $get_query = "SELECT * FROM rehoming_listings";
-    $result = mysqli_query($connection, $get_query);
-
-    if ($result && mysqli_num_rows($result) >  0) {
-      while ($row = mysqli_fetch_assoc($result)) {
-        echo "
-          <div class='row'>
+            <p>{$row['pet_id']}</p>
             <p>{$row['pet_name']}</p>
             <p>{$row['age']}</p>
             <p>{$row['type']}</p>
-            <p>{$row['gender']}</p>
             <p>{$row['breed']}</p>
+            <p>{$row['gender']}</p>
             <p class='pet_desc'>{$row['pet_desc']}</p>
-            <p>{$row['rehoming_status']}</p>
-            <p>{$row['owner_name']}</p>
-            <p>{$row['contact_no']}</p>
-            <p class='reason'>{$row['reason']}</p>
-            <p>{$row['time_listed']}</p>
-            <form action='admin-delete.php' method='post' onsubmit=\"return confirm('Delete rehoming listing?')\"'>
-              <input type='hidden' value='{$row['rehoming_id']}' name='rehoming_id'>
-              <button type='submit' class='delete-btn'>Delete</button>
+            <p class='pet_desc'>{$row['reason']}</p>
+            <p>{$row['created']}</p>
+            <p>{$row['updated']}</p>
+            <form action='admin-delete.php' method='post' onsubmit=\"return confirm('This action is irreversible. Delete pet {$row['pet_name']}?')\">
+              <input type='hidden' value='{$row['pet_id']}' name='pet_id'>
+              <input type='hidden' value='{$row['pet_name']}' name='pet_name'>
+              <button type='submit'class='delete-btn'>Delete</button>
             </form>
           </div>
         ";
       }
     }
   }
+       
 
   // USER DELETE
   if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['user_id'])) {
     $user_id = $_POST['user_id'];
+    $user_name = $_POST['user_name'];
+    $admin_id = $_SESSION['user_id'];
+    $admin_name = $_SESSION['user_name'];
+    
+    // Delete User
     $delete_query = "DELETE FROM users WHERE user_id = '$user_id'";
     mysqli_query($connection, $delete_query);
+    
+    // Add Transaction (log)
+    $details = mysqli_real_escape_string($connection, "$admin_name deleted user $user_name ($user_id).");
 
-    echo "<script>alert('User Deleted.');</script>";
+    $transac_query = 
+      "INSERT INTO transactions (user_id, pet_id, trans_type, trans_details, category)
+      VALUES ('$admin_id', NULL, 'User delete', '$details', 'User')";
+
+    mysqli_query($connection, $transac_query);
 
     header('Location: admin-delete.php');
+    exit();
   }
 
-  // ADOPTION DELETE
-  if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['adoption_id'])) {
-    $user_id = $_POST['adoption_id'];
-    $delete_query = "DELETE FROM adoption_listings WHERE adoption_id = '$adoption_id'";
+  // PET DELETE
+  if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['pet_id'])) {
+    $pet_id = $_POST['pet_id'];
+    $pet_name = $_POST['pet_name'];
+    $admin_id = $_SESSION['user_id'];
+    $admin_name = $_SESSION['user_name'];
+    
+    // Delete Pet
+    $delete_query = "DELETE FROM pet_profile WHERE pet_id = '$pet_id'";
     mysqli_query($connection, $delete_query);
 
-    echo "<script>alert('Adoption Listing Deleted.');</script>";
+    // Add Transaction (log)
+    $details = mysqli_real_escape_string($connection, "$admin_name deleted pet $pet_name ($pet_id).");
 
-    header('Location: admin-delete.php');
-  }
+    $transac_query = 
+      "INSERT INTO transactions (user_id, pet_id, trans_type, trans_details, category)
+      VALUES ('$admin_id', '$pet_id', 'Pet delete', '$details', 'Pet')";
+    
+    mysqli_query($connection, $transac_query);
 
-  // REHOMING DELETE
-  if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['rehoming_id'])) {
-    $rehoming_id = $_POST['rehoming_id'];
-    $delete_query = "DELETE FROM rehoming_listings WHERE rehoming_id = $rehoming_id;";
-    mysqli_query($connection, $delete_query);
-    
-    echo "<script>alert('Rehoming Listing Deleted.');</script>";
-    
     header('Location: admin-delete.php');
   }
 ?> 
@@ -199,10 +189,10 @@
   <main>
     <!-- USER TABLE -->
     <section class="section-1">
-      <div class="user-wrapper">
-        <h2>User Table</h2>
+      <div class="table-wrapper">
+        <h2>Customers Table</h2>
         <div class="table-scroll">
-          <div class="user-table">
+          <div class="table">
             <div class="row user">
               <p>Username</p>
               <p>Email</p>
@@ -216,57 +206,31 @@
       </div>
     </section>
 
-    <!-- ADOPTION TABLE -->
-    <section class="section-2">
-      <div class="adoption-wrapper">
-        <h2>Adoption Listings Table</h2>
+    <!-- PET TABLE -->
+    <section class="section-1">
+      <div class="table-wrapper">
+        <h2>Pet Table</h2>
         <div class="table-scroll">
-          <div class="adoption-table">
-            <div class="row update">
-              <p>Owner</p>
-              <p>Pet Name</p>
-              <p>Age</p>
-              <p>Type</p>
-              <p>Breed</p>
-              <p>Gender</p>
-              <p>Pet Description</p>
-              <p>Contact</p>
+          <div class="table">
+            <div class="row pet-delete">
               <p>Status</p>
-              <p>Date Listed</p>
-              <p>Administrator</p>
-              <p></p>
-            </div>
-              <?php adoptionList($connection); ?>
-            </div>
-          </div>
-        </div>
-    </section>
-
-    <!-- REHOMING TABLE -->
-    <section class="section-3">
-      <div class="rehoming-wrapper">
-        <h2>Rehoming Listings Table</h2>
-        <div class="table-scroll">
-          <div class="rehoming-table">
-            <div class="row">
+              <p>Owner</p>
+              <p>Pet Number</p>
               <p>Pet Name</p>
               <p>Age</p>
               <p>Type</p>
-              <p>Gender</p>
               <p>Breed</p>
+              <p>Gender</p>
               <p>Pet Description</p>
-              <p>Rehoming Status</p>
-              <p>Owner Name</p>
-              <p>Contact Number</p>
               <p>Reason</p>
-              <p>Time Listed</p>
+              <p>Date Created</p>
+              <p>Date Updated</p>
               <p></p>
             </div>
-            <?php rehomingList($connection) ?>
+            <?php petList($connection); ?>
           </div>
         </div>
       </div>
-    </section>
     </section>
   </main>
 

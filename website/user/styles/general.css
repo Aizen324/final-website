@@ -13,6 +13,7 @@
   --yellow-light-clr: #FEFFA7;
   --white-clr: #FFFFE4;
   --shadow-clr: #00000087;
+  --error-delete-clr: #ff2727;
 }
 
 * {

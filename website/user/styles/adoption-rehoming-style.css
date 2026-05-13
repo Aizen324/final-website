@@ -157,11 +157,18 @@
 .no-pet {
   text-align: center;
 }
-.btn-learn,
-.btn-details {
+
+.card-btn {
   align-self: flex-end;
+}
+
+.btn-learn,
+.btn-details,
+.adopt-btn,
+.rehome-btn {
   margin-top: 14px;
-  background: #F5C842;
+  min-width: 100px;
+  background-color: #F5C842;
   border: none;
   padding: 12px 25px;
   font-size: 12px;
@@ -171,9 +178,34 @@
   text-transform: uppercase;
   transition: all 0.3s ease-in-out;
 }
+/* .btn-delete {
+  margin-top: 14px;
+  background-color: transparent;
+  border: 2px solid var(--error-delete-clr);
+  color: var(--error-delete-clr);
+  padding: 12px 25px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 20px;
+  text-transform: uppercase;
+  transition: all 0.3s ease-in-out;
+}
+.btn-delete:hover {
+  background-color: var(--error-delete-clr);
+  color: var(--white-clr);
+  filter: drop-shadow(1px 3px 2px var(--shadow-clr));
+} */
+
+.adopt-btn,
+.rehome-btn {
+  width: 200px;
+}
 
 .btn-learn:hover,
-.btn-details:hover {
+.btn-details:hover,
+.adopt-btn:hover,
+.rehome-btn:hover {
   background: var(--teal-clr);
   color: var(--white-clr);
   filter: drop-shadow(1px 3px 2px var(--shadow-clr));
@@ -283,10 +315,10 @@
   line-height: 1;
   font-weight: 300;
 }
-.status-verified {
+.status-adoption {
   color: var(--teal-clr);
 }
-.status-unverified {
+.status-rehoming {
   color: #f83e3e;
 }
 
@@ -370,10 +402,28 @@
   z-index: 2;
   display: flex;
   flex: 1;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 10px;
+}
+.details-modal .modal-info div:nth-child(1) {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex: 1;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
   gap: 10px;
+}
+.details-modal .modal-info div:nth-child(2) {
+  position: relative;  
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  height: 100%;
 }
 .details-modal .modal-info p {
   display: flex;
@@ -384,17 +434,17 @@
 .details-modal .modal-info b {
   width: 160px;
 }
-.details-modal .modal-info span {
+.details-modal .modal-info div span {
   display: flex;
   align-items: center;
   width: 300px;
   min-height: 40px;
   position: relative;
 }
-.details-modal .modal-info .modalDesc {
+.details-modal .modalDesc {
   display: block;
   max-height: 40px;
-  overflow-y: auto;
+  overflow-y: scroll;
   overflow-x: hidden;
   white-space: pre-wrap;
 }

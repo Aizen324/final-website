@@ -1,6 +1,5 @@
 /* MODAL DESIGN */
-.adoption-modal-overlay,
-.rehome-modal-overlay {
+.modal-overlay {
   height: 100vh;
   width: 100%;
   position: fixed;
@@ -18,8 +17,7 @@
   cursor: pointer;
 }
 
-.adoption-modal-overlay h3,
-.rehome-modal-overlay h3 {
+.modal-overlay h3 {
   text-align: center;
   margin-bottom: 20px;
   font-size: 24px;
@@ -118,9 +116,30 @@
   justify-content: center;
 }
 
-.adoption-wrapper,
-.rehoming-wrapper,
-.user-wrapper {
+.section-1.create {
+  height: 110vh;
+}
+
+.line {
+  width: 90%;
+  margin-bottom: 50px;
+
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  font-weight: 600;
+  font-size: 1.3rem;
+}
+
+.line span {
+  width: 100%;
+  height: 1px;
+  background-color: var(--black-clr);
+}
+
+
+.table-wrapper {
   width: 90%;
   height: 65vh;
 }
@@ -133,10 +152,7 @@
   border: 3px solid var(--teal-clr);
 }
 
-.adoption-table,
-.rehoming-table,
-.user-table
-{
+.table {
   min-width: 1200px;
   padding: 10px;
   height: max-content;
@@ -147,10 +163,7 @@
   overflow: visible;
 }
 
-.adoption-table .row,
-.rehoming-table .row,
-.user-table .row
-{
+.table .row {
   min-width: max-content;
   min-height: 40px;
   display: grid;
@@ -164,30 +177,28 @@
   font-size: 14px;
 }
   /* Override Grid Columns */
-  .user-table .row.user {
+  .table .row.pet-record {
+    grid-template-columns: 
+      120px 140px 120px 100px 120px 120px 120px 120px 250px 250px 160px 160px;
+  }
+  .table .row.transaction {
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 300px;
+  }
+  .table .row.pet-update,
+  .table .row.pet-delete {
+    grid-template-columns: 
+      140px 130px 130px 100px 120px 120px 120px 120px 250px 250px 160px 160px 150px;
+  }
+  .table .row.user {
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   }
 
-  .adoption-table .row.update {
-    grid-template-columns: 
-      180px 180px 80px 120px 160px 100px 300px 140px 120px 170px 140px 130px;
-  }
-  .rehoming-table .row {
-    grid-template-columns: 
-      150px 80px 120px 100px 100px 230px 120px 150px 120px 230px 160px 130px;
-  }
 
-.adoption-table .row:first-child,  
-.rehoming-table .row:first-child,
-.user-table .row:first-child
-{
+.table .row:first-child {
   border: none;
 }
 
-.adoption-table .row:first-child p,
-.rehoming-table .row:first-child p,
-.user-table .row:first-child p
-{
+.table .row:first-child p {
   font-size: 12.5px;
   text-align: center;
   margin-bottom: 10px;
@@ -320,8 +331,7 @@ select:focus {
 }
 
 /* UPDATE BUTTON */
-.adopt-update-btn,
-.rehome-update-btn,
+.update-btn,
 .delete-btn {
   width: 100%;
   height: 25px;
@@ -332,8 +342,7 @@ select:focus {
   cursor: pointer;
 }
 
-.adopt-update-btn,
-.rehome-update-btn {
+.update-btn {
   color: var(--white-clr);
   background-color: var(--teal-clr);
 }
@@ -343,8 +352,7 @@ select:focus {
   background-color: var(--error-delete-clr);
 }
 
-.adopt-update-btn:hover,
-.rehome-update-btn:hover {
+.update-btn:hover {
   background-color: var(--white-clr);
   color: var(--teal-clr);
   border: 2px solid var(--teal-clr);

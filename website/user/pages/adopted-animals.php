@@ -16,7 +16,7 @@
     $get_query = 
       "SELECT pet_id, pet_name, age, type, breed, gender, pet_desc, pet_image, status
       FROM pet_profile
-      WHERE status = 'For adoption' AND user_id != '$user_id'";
+      WHERE status = 'Adopted' AND user_id = '$user_id'";
     $result = mysqli_query($connection, $get_query);
 
     if ($result && mysqli_num_rows($result) > 0) {
@@ -26,40 +26,11 @@
     }
   } catch (mysqli_sql_exception) {}
 
-  try {
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['adoption-submit'])) {
-      $pet_id = $_POST['pet_id'];
-      $pet_name = $_POST['pet_name'];
-      $new_owner_id = $user_id;
-
-      // UPDATE OWNER AND STATUS
-      $update_query = 
-        "UPDATE pet_profile
-         SET status = 'Adopted', user_id = '$new_owner_id'
-         WHERE pet_id = $pet_id";
-         
-      mysqli_query($connection, $update_query);
-
-      // ADD TRANSACTION LOG
-      $details = mysqli_real_escape_string($connection, "$name adopted $pet_name ($pet_id)");
-
-      $transac_query = 
-        "INSERT INTO transactions (user_id, pet_id, trans_type, trans_details, category)
-        VALUES ('$new_owner_id', '$pet_id', 'Adopted', '$details', 'Pet')";
-        
-      mysqli_query($connection, $transac_query);
-
-      header("Location: adoption-page.php");
-      exit();
-    }
-  } catch (mysqli_sql_exception) {}
-
-
   function displayPets($pets) {
     if (empty($pets)) {
       echo "
         <p class='no-pet'></p>
-        <p class='no-pet'>No pets available for adoption.</p>
+        <p class='no-pet'>You have not adopted any pets.</p>
         <p class='no-pet'></p>
       ";
     } else {
@@ -108,6 +79,29 @@
       }
     }
   }
+
+  if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rehome-submit'])) {
+    $pet_id = (int) $_POST['pet_id'];
+    $pet_name = $_POST['pet_name'];
+    $user_id = (int) $_SESSION['user_id'];
+    
+    // Updates the status of the pet
+    $update_query = "UPDATE pet_profile SET status = 'For rehoming' WHERE pet_id = $pet_id";
+
+    mysqli_query($connection, $update_query);
+
+    // Add Transaction log
+    $details = mysqli_real_escape_string($connection, "$name rehomed $pet_name ($pet_id)");
+
+    $transac_query = 
+      "INSERT INTO transactions (user_id, pet_id, trans_type, trans_details, category)
+      VALUES ('$user_id', '$pet_id', 'For rehoming', '$details', 'Pet')";
+      
+    mysqli_query($connection, $transac_query);
+
+    header("Location: rehoming-page.php");
+    exit();
+  }
 ?>
 
 <!DOCTYPE html>
@@ -118,7 +112,7 @@
   <link rel="stylesheet" href="../styles/general.css">
   <link rel="stylesheet" href="../styles/adoption-rehoming-style.css" />
   <link rel="icon" type="image/x-icon" href="../../images/logo.png">
-  <title>Adopt a Pet</title>
+  <title>Adopted Pets | Tailmates</title>
 </head>
 
 <body>
@@ -140,10 +134,10 @@
           <p><b>Status:</b> <span class="modalStatus"></span></p>
         </div>
         <div>
-          <form action="adoption-page.php" method="post" onsubmit="return confirm('Are you sure you want to adopt this pet? This action cannot be undone.')">
+          <form action="adopted-animals.php" method="post" onsubmit="return confirm('Are you sure you want to rehome this pet? This action cannot be undone.')">
             <input type="hidden" name="pet_id" class="modalPetId">
             <input type="hidden" name="pet_name" class="modal_PetName">
-            <button type="submit" name='adoption-submit' class="adopt-btn">Adopt</button>
+            <button type="submit" name='rehome-submit' class="rehome-btn">Rehome this Pet</button>
           </form>
         </div>
       </div>
@@ -221,49 +215,13 @@
   <main>
     <section class="adoption-section-1">
       <div>
-        <h1>ADOPT A PET</h1>
-        <p>Find your new best friend and change a life forever.<br />Meet our adoptable pets.</p>
+        <h1>YOUR ADOPTED PETS</h1>
       </div>
     </section>
     
     <section class="adoption-section-2">
-      <!-- SEARCH BAR -->
-      <!-- <div class="search-bar-wrap">
-        <div class="search-bar">
-          <div class="search-input-wrap">
-            <span class="search-icon">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="6.5" cy="6.5" r="5" stroke="#666" stroke-width="1.5"/>
-                <line x1="10.5" y1="10.5" x2="15" y2="15" stroke="#666" stroke-width="1.5" stroke-linecap="round"/>
-              </svg>
-            </span>
-            <input type="text" id="adopt-search" placeholder="Search" />
-          </div>
-          <select class="filter-select" id="adopt-type-filter">
-            <option value="">Type</option>
-            <option value="dog">Dog</option>
-            <option value="cat">Cat</option>
-            <option value="bird">Bird</option>
-            <option value="rabbit">Rabbit</option>
-            <option value="snake">Snake</option>
-            <option value="fish">Fish</option>
-          </select>
-        </div>
-      </div> -->
-
       <div class="pet-grid" id="adopt-grid">
         <?php displayPets($pets); ?>
-      </div>
-    </section>
-
-    <section class="section-3">
-      <div class="wrapper">
-        <img src="../../images/dog-house.png" alt="dog house" id="dog-house">
-        <div class="text-container">
-          <p>You can also rehome your pets!</p>
-          <button class="rehoming-btn">Go to Rehome Page &#8594;</button>
-        </div>
-        <img src="../../images/running-dog.png" alt="running dog" id="running-dog">
       </div>
     </section>
   </main>

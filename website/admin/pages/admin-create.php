@@ -12,7 +12,9 @@
   }
 
   include('../../database/database.php');
-  
+
+  // Add adoption listing 
+  // The admin can add stray animals from shelters that are ready for 
   if (isset($_POST['add'])) {
     try {
       $pet_name = filter_input(INPUT_POST, "pet_name", FILTER_SANITIZE_SPECIAL_CHARS);
@@ -21,45 +23,87 @@
       $breed = filter_input(INPUT_POST, "breed", FILTER_SANITIZE_SPECIAL_CHARS);
       $gender = filter_input(INPUT_POST, "gender", FILTER_SANITIZE_SPECIAL_CHARS);
       $pet_desc = filter_input(INPUT_POST, "pet_desc", FILTER_SANITIZE_SPECIAL_CHARS);
-      $owner_name = filter_input(INPUT_POST, "owner_name", FILTER_SANITIZE_SPECIAL_CHARS);
-      $contact_no = filter_input(INPUT_POST, "contact_no", FILTER_SANITIZE_SPECIAL_CHARS);
+      $reason = filter_input(INPUT_POST, "reason", FILTER_SANITIZE_SPECIAL_CHARS);
       $user_id = $_SESSION['user_id'];
+      $user_name = $_SESSION['user_name'];
 
+      $imageName = $_FILES['pet_image']['name'];
+      $imageTemp = $_FILES['pet_image']['tmp_name'];
+      $newImageName = time() . '_' . $imageName;
+      $uploadPath = '../../uploads/' . $newImageName;
+      move_uploaded_file($imageTemp, $uploadPath);
+
+      // INSERT PET
       $insert_query =
-      "INSERT INTO adoption_listings (pet_name, age, type, breed, gender, pet_desc, owner_name, contact_no, user_id)
-      VALUES ('$pet_name', '$age', '$type', '$breed', '$gender', '$pet_desc', '$owner_name', '$contact_no', '$user_id');
-      ";
+        "INSERT INTO pet_profile (user_id, pet_name, age, type, gender, breed, pet_image, pet_desc, status, reason)
+        VALUES ('$user_id', '$pet_name', '$age', '$type', '$gender', '$breed', '$newImageName', '$pet_desc', 'For adoption', '$reason');
+        ";
       mysqli_query($connection, $insert_query);
 
-      echo "<script>alert('New pet added to adoption listing.');</script>";
+      // ADD TRANSACTION
+      $pet_id = mysqli_insert_id($connection);
+
+      $details = mysqli_real_escape_string($connection, "$user_name added pet $pet_name ($pet_id) to the adoption listing.");
+
+      $transac_query = 
+        "INSERT INTO transactions (user_id, pet_id, trans_type, trans_details, category)
+        VALUES ('$user_id', '$pet_id', 'For adoption', '$details', 'Pet')";
+        
+      mysqli_query($connection, $transac_query);
 
       header('Location: admin-create.php');
     } catch (mysqli_sql_exception) {} 
   }
 
 
-  function adoptionList($connection) {
+  function petList($connection) {
     $get_query = 
-      "SELECT a.pet_name, a.age, a.type, a.breed, a.gender, a.pet_desc, a.owner_name, a.contact_no, a.adoption_status, a.date_listed, u.user_name 
-      FROM adoption_listings a
-      LEFT JOIN users u ON a.user_id = u.user_id";
+      "SELECT pet_id, pet_name, age, type, breed, gender, pet_desc, reason, status, created, updated, user_name
+      FROM pet_profile p
+      LEFT JOIN users u ON p.user_id = u.user_id";
     $result = mysqli_query($connection, $get_query);
     
     if ($result && mysqli_num_rows($result) > 0) {
       while ($row = mysqli_fetch_assoc($result)) {
         echo "
-          <div class='row'>
-            <p>{$row['owner_name']}</p>
+          <div class='row pet-record'>
+            <p>{$row['status']}</p>
+            <p>{$row['user_name']}</p>
+            <p>{$row['pet_id']}</p>
             <p>{$row['pet_name']}</p>
             <p>{$row['age']}</p>
             <p>{$row['type']}</p>
             <p>{$row['breed']}</p>
             <p>{$row['gender']}</p>
             <p class='pet_desc'>{$row['pet_desc']}</p>
-            <p>{$row['contact_no']}</p>
-            <p>{$row['adoption_status']}</p>
-            <p>{$row['date_listed']}</p>
+            <p class='pet_desc'>{$row['reason']}</p>
+            <p>{$row['created']}</p>
+            <p>{$row['updated']}</p>
+          </div>
+        ";
+      }
+    }
+  }
+
+  function transactionsList($connection) {
+    $get_query = 
+      "SELECT t.trans_id, u.user_name, p.pet_name, t.trans_type, t.trans_date, t.trans_details
+       FROM transactions t
+       JOIN users u ON t.user_id = u.user_id
+       JOIN pet_profile p ON t.pet_id = p.pet_id
+       ORDER BY t.trans_id ASC";
+    $result = mysqli_query($connection, $get_query);
+    
+    if ($result && mysqli_num_rows($result) > 0) {
+      while ($row = mysqli_fetch_assoc($result)) {
+        echo "
+          <div class='row transaction'>
+            <p>{$row['trans_id']}</p>
             <p>{$row['user_name']}</p>
+            <p>{$row['pet_name']}</p>
+            <p>{$row['trans_type']}</p>
+            <p>{$row['trans_date']}</p>
+            <p>{$row['trans_details']}</p>
           </div>
         ";
       }
@@ -134,12 +178,12 @@
   </nav>
 
   <main>
-    <section class="section-1">
+    <section class="section-1 create">
       <div class="form-container">
         <div class="header-text">
           <h2>Create Adoption Listing</h2>
         </div>
-        <form action="<?php htmlspecialchars($_SERVER['PHP_SELF']);?>" method="post">
+        <form action="<?php htmlspecialchars($_SERVER['PHP_SELF']);?>" method="post" enctype="multipart/form-data">
           <div class="input-wrapper">
             <p>Pet Name: </p>
             <input type="text" name="pet_name" required>
@@ -152,12 +196,20 @@
 
           <div class="input-wrapper">
             <p>Type: </p>
-            <input type="text" placeholder="e.g. Dog" name="type" required>
+            <select name="type" class="user-input" id="petType" required>
+              <option value="" disabled selected>Select pet type</option>
+              <option value="Dog">Dog</option>
+              <option value="Cat">Cat</option>
+              <option value="Bird">Bird</option>
+              <option value="Rabbit">Rabbit</option>
+            </select>
           </div>
 
           <div class="input-wrapper">
             <p>Breed: </p>
-            <input type="text" name="breed">
+            <select name="breed" class="user-input" id="petBreed" required>
+              <option value="" disabled selected>Select pet breed</option>
+            </select>
           </div>
 
           <div class="input-wrapper">
@@ -170,18 +222,18 @@
           </div>
 
           <div class="input-wrapper">
+            <p>Pet Image: </p>
+            <input type="file" class="user-input" name="pet_image" id="pet_image" accept="image/*" required>
+          </div>
+
+          <div class="input-wrapper">
             <p>Pet Description: </p>
             <textarea name="pet_desc" required></textarea>
           </div>
 
           <div class="input-wrapper">
-            <p>Owner Name: </p>
-            <input type="text" name="owner_name" required>
-          </div>
-
-          <div class="input-wrapper">
-            <p>Contact Number: </p>
-            <input type="text" name="contact_no" required>
+            <p>Reason: </p>
+            <textarea name="reason" required></textarea>
           </div>
 
           <img src="../../images/two-paws.png" alt="paws" id="paw-img">
@@ -192,30 +244,84 @@
     </section>
 
     <section class="section-2">
-      <div class="adoption-wrapper">
-        <h2>Adoption Listings Table</h2>
+      <p class="line"><span></span>RECORDS<span></span></p>
+      <div class="table-wrapper">
+        <h2>Pet Table</h2>
         <div class="table-scroll">
-          <div class="adoption-table">
-            <div class="row">
+          <div class="table">
+            <div class="row pet-record">
+              <p>Status</p>
               <p>Owner</p>
+              <p>Pet Number</p>
               <p>Pet Name</p>
               <p>Age</p>
               <p>Type</p>
               <p>Breed</p>
               <p>Gender</p>
               <p>Pet Description</p>
-              <p>Contact</p>
-              <p>Status</p>
-              <p>Date Listed</p>
-              <p>Administrator</p>
+              <p>Reason</p>
+              <p>Date Created</p>
+              <p>Date Updated</p>
             </div>
-            <?php adoptionList($connection); ?>
+            <?php petList($connection); ?>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-3">
+      <div class="table-wrapper">
+        <h2>Transactions Table</h2>
+        <div class="table-scroll">
+          <div class="table">
+            <div class="row transaction">
+              <p>Transaction Number</p>
+              <p>User</p>
+              <p>Pet</p>
+              <p>Transaction Type</p>
+              <p>Transaction Date</p>
+              <p>Transaction Details</p>
+            </div>
+            <?php transactionsList($connection); ?>
           </div>
         </div>
       </div>
     </section>
   </main>
 
+  <script>
+    const petType = document.getElementById('petType');
+    const breedSelect = document.getElementById('petBreed');
+    const breeds = {
+      Dog: ['Unknown', 'German Shepherd', 'Siberian Husky', 'Aspin', 'Labrador', 'Golden Retriever', 'Pug', 'Chihuahua', 'Terrier', 'Shiba Inu', 'Bulldog'],
+      Cat: ['Unknown', 'Maine Coon', 'British Shorthair', 'Siamese', 'Scottish Fold', 'Puspin'],
+      Bird: ['Unknown', 'Parrot', 'Cockatiel', 'Lovebird', 'Dove', 'Macaw'],
+      Rabbit: ['Unknown', 'Lionhead', 'Mini Rex', 'Netherland Dwarf', 'English Angora', 'Californian']
+    }
+
+    petType.addEventListener('change', () => {
+      const selectedType = petType.value;
+      
+      breedSelect.innerHTML = '<option value="" disabled selected>Select pet breed</option>';
+
+      breeds[selectedType].forEach(breed => {
+        const option = document.createElement('option');
+
+        option.value = breed;
+        option.textContent = breed;
+
+        breedSelect.appendChild(option);
+      });
+    });
+
+    document.getElementById('pet_image').addEventListener('change', function() {
+      const file = this.files[0];
+      if (file && !file.type.startsWith('image/')) {
+          alert("Please select an image file only.");
+          this.value = '';
+      }
+    });
+  </script>
   <script src="../scripts/admin-navigation.js" defer></script>
 </body>
 </html>

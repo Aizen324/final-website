@@ -1,8 +1,8 @@
 <?php   
-  $db_server = "localhost";
-  $db_user = "root";
-  $db_password = "";
-  $db_name = "tailmatesdb";
+  $db_server = getenv('DB_HOST');
+  $db_user = getenv('DB_USER');
+  $db_password = getenv('DB_PASS');
+  $db_name = getenv('DB_NAME');
   $connection = null;
 
   try {

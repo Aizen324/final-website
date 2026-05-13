@@ -12,26 +12,26 @@
 
   try {
     $get_query = 
-        "SELECT pet_name, age, gender, type, breed, pet_image, pet_desc, rehoming_status
-        FROM rehoming_listings
-        WHERE user_id = $user_id";
+        "SELECT pet_name, age, gender, type, breed, pet_image, pet_desc, status
+        FROM pet_profile
+        WHERE user_id = $user_id AND status IN ('For rehoming', 'For adoption')";
 
         $result = mysqli_query($connection, $get_query);
-        $rehomingListings = [];
+        $pets = [];
 
         if ($result && mysqli_num_rows($result) > 0) {
           while ($row = mysqli_fetch_assoc($result)) {
-            $rehomingListings[] = $row;
+            $pets[] = $row;
           }
         }
 
-    $_SESSION['rehomingListings'] = $rehomingListings;
+    $_SESSION['pets'] = $pets;
   } catch(mysqli_sql_exception) {}
 
-  if (!empty($_SESSION['rehomingListings'])) {
-    $listings = $_SESSION['rehomingListings'];
+  if (!empty($_SESSION['pets'])) {
+    $pets = $_SESSION['pets'];
   } else {
-    $listings = [];
+    $pets = [];
   }
 ?>
 
@@ -55,12 +55,14 @@
         <img src="../../images/text-line-decoration.png" alt="text-line-decor" id="line-decor">
       </div>
       <div class="modal-info">
-        <p><b>Age:</b> <span class="modalAge"></span></p>
-        <p><b>Gender:</b> <span class="modalGender"></span></p>
-        <p><b>Type:</b> <span class="modalType"></span></p>
-        <p><b>Breed:</b> <span class="modalBreed"></span></p>
-        <p><b>Pet Description:</b> <span class="modalDesc"></span></p>
-        <p><b>Rehoming Status:</b> <span class="modalStatus"></span></p>
+        <div>
+          <p><b>Age:</b> <span class="modalAge"></span></p>
+          <p><b>Gender:</b> <span class="modalGender"></span></p>
+          <p><b>Type:</b> <span class="modalType"></span></p>
+          <p><b>Breed:</b> <span class="modalBreed"></span></p>
+          <p><b>Pet Description:</b> <span class="modalDesc"></span></p>
+          <p><b>Status:</b> <span class="modalStatus"></span></p>
+        </div>
       </div>
       <img src="../../images/teal-paw.png" alt="paw" id="teal-paw">
       <img src="../../images/paws-side-pattern.png" alt="paw pattern" id="paws-side-pattern">
@@ -86,6 +88,10 @@
           <img src="../../icons/settings-icon.png" alt="settings-icon">
           <p>Settings and Privacy</p>
         </div>
+        <a href="adopted-animals.php">
+          <img src="../../icons/cat-icon.png" alt="cat-icon">
+          <p>See Adopted Pets</p>
+        </a>
         <a href="../../database/logout.php" class="logout" name="logout">
           <img src="../../icons/logout-icon.png" alt="logout-icon">
           <p>Logout</p>
@@ -140,35 +146,35 @@
       <div class="section-title-divider"><span>List of Pets</span></div>
       
       <div class="rehome-grid" id="rehome-grid">
-        <?php if (!empty($_SESSION['rehomingListings'])): ?>
-          <?php foreach($listings as $listing): ?>
+        <?php if (!empty($_SESSION['pets'])): ?>
+          <?php foreach($pets as $pet): ?>
             <div class="rehome-card">
               <div class="pet-card-img-placeholder">
-                <img src="../../uploads/<?php echo $listing['pet_image']; ?>" alt="Pet placeholder image">
+                <img src="../../uploads/<?php echo $pet['pet_image']; ?>" alt="Pet placeholder image">
               </div>
 
               <div class="pet-card-body">
                 <div class="pet-card-info">
                   <div>
-                    <p><span class="label">Name:</span> <?php echo $listing['pet_name']; ?></p>
+                    <p><span class="label">Name:</span> <?php echo $pet['pet_name']; ?></p>
                     <p><span class="label">Age:</span> 
                       <?php 
-                        if ($listing['age'] != "") { 
-                          echo $listing['age'];
+                        if ($pet['age'] != "") { 
+                          echo $pet['age'];
                         } else { echo "Unknown"; } ?>
                     </p>
-                    <p><span class="label">Type:</span> <?php echo $listing['type']; ?></p>
+                    <p><span class="label">Type:</span> <?php echo $pet['type']; ?></p>
                     <p>
                       <span class="label">Status:</span> 
-                      <span class="<?php echo $listing['rehoming_status'] === 'Verified' ? 'status-verified' : 'status-unverified'; ?>">
-                        <?php echo $listing['rehoming_status']?>
+                      <span class="<?php echo $pet['status'] === 'For rehoming' ? 'status-rehoming' : 'status-adoption'; ?>">
+                        <?php echo $pet['status']?>
                       </span>
                     </p>
                   </div>
                   <div>
-                    <span class="gender-icon <?php echo $listing['gender'] === 'male' ? 'male' : 'female'; ?>">
+                    <span class="gender-icon <?php echo $pet['gender'] === 'male' ? 'male' : 'female'; ?>">
                       <?php 
-                        if ($listing['gender'] == 'male') {
+                        if ($pet['gender'] == 'male') {
                           echo "♂";
                         } else {
                           echo "♀";
@@ -178,17 +184,19 @@
                   </div>
                 </div>
 
-                <button class="btn-details"
-                  data-name = "<?php echo htmlspecialchars($listing['pet_name']); ?>"
-                  data-age = "<?php echo htmlspecialchars($listing['age']); ?>"
-                  data-gender = "<?php echo htmlspecialchars($listing['gender']); ?>"
-                  data-type = "<?php echo htmlspecialchars($listing['type']); ?>"
-                  data-breed = "<?php echo htmlspecialchars($listing['breed']); ?>"
-                  data-desc = "<?php echo htmlspecialchars($listing['pet_desc']); ?>"
-                  data-status = "<?php echo htmlspecialchars($listing['rehoming_status']); ?>"
-                >
-                  Details
-                </button>
+                <div class='card-btn'>
+                  <button class="btn-details"
+                    data-name = "<?php echo htmlspecialchars($pet['pet_name']); ?>"
+                    data-age = "<?php echo htmlspecialchars($pet['age']); ?>"
+                    data-gender = "<?php echo htmlspecialchars($pet['gender']); ?>"
+                    data-type = "<?php echo htmlspecialchars($pet['type']); ?>"
+                    data-breed = "<?php echo htmlspecialchars($pet['breed']); ?>"
+                    data-desc = "<?php echo htmlspecialchars($pet['pet_desc']); ?>"
+                    data-status = "<?php echo htmlspecialchars($pet['status']); ?>"
+                  >
+                    Details
+                  </button>
+                </div>
               </div>
             </div>
           <?php endforeach; ?>

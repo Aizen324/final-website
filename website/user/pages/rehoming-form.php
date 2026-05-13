@@ -18,8 +18,8 @@
       $type      = mysqli_real_escape_string($connection, $_POST["type"]);
       $breed     = mysqli_real_escape_string($connection, $_POST["breed"]);
       $petDesc   = mysqli_real_escape_string($connection, $_POST["pet_desc"]);
-      $ownerName = mysqli_real_escape_string($connection, $_POST["owner_name"]);
-      $contact   = mysqli_real_escape_string($connection, $_POST["contact_num"]);
+      // $ownerName = mysqli_real_escape_string($connection, $_POST["owner_name"]);
+      // $contact   = mysqli_real_escape_string($connection, $_POST["contact_num"]);
       $reason    = mysqli_real_escape_string($connection, $_POST["reason"]);
 
       $imageName = $_FILES['pet_image']['name'];
@@ -29,11 +29,21 @@
       move_uploaded_file($imageTemp, $uploadPath);
 
       $insert_query = 
-        "INSERT INTO rehoming_listings (pet_name, age, type, gender, breed, pet_image, pet_desc, owner_name, contact_no, reason, user_id) 
+        "INSERT INTO pet_profile (pet_name, user_id, age, type, gender, breed, pet_image, pet_desc, reason) 
         VALUES 
-          ('$petName', '$age', '$type', '$gender', '$breed', '$newImageName', '$petDesc', '$ownerName', '$contact', '$reason', '$user_id')";
+          ('$petName', '$user_id', '$age', '$type', '$gender', '$breed', '$newImageName', '$petDesc', '$reason')";
       
       mysqli_query($connection, $insert_query);
+
+      $pet_id = mysqli_insert_id($connection);
+      $details = mysqli_real_escape_string($connection, "$name rehomed $petName ($pet_id)");
+
+      $transac_query = 
+        "INSERT INTO transactions (user_id, pet_id, trans_type, trans_details, category)
+        VALUES ('$user_id', '$pet_id', 'For rehoming', '$details', 'Pet')";
+        
+      mysqli_query($connection, $transac_query);
+
       header('Location: rehoming-page.php');
       exit();
     }
@@ -120,17 +130,22 @@
           <div class="wrapper">
             <p>Image <span>*</span></p>
             <div class="input-wrapper">
-              <input type="file" class="user-input" name="pet_image" accept="image/*" required>
+              <input type="file" class="user-input" name="pet_image" id="pet_image" accept="image/*" required>
             </div>
           </div>
 
           <div class="wrapper">
-            <p>Pet Description <span>*</span></p>
-            <textarea class="description-input user-input" maxlength="700" name="pet_desc" required></textarea>
+            <p id="pet-description">Pet Description <span>*</span><img src="../../icons/help.png" alt="Help" id="help-icon"> <span class="tooltipText">You can include your pet's behavior, physical characteristics, and favorite food.</span></p>
+            <textarea class="description-input user-input"  name="pet_desc" required></textarea>
           </div>
+
+            <div class="wrapper">
+              <p>Reason for Rehoming <span>*</span></p>
+              <textarea class="description-input user-input"  name="reason" required></textarea>
+            </div>
         </div>
         
-        <div class="line"></div>
+        <!-- <div class="line"></div>
 
         <div class="form2-container">
           <h2>Owner Information</h2>
@@ -153,7 +168,7 @@
               <p>Reason for Rehoming <span>*</span></p>
               <textarea class="description-input user-input" maxlength="700" name="reason" required></textarea>
             </div>
-        </div>
+        </div> -->
 
         <div class="buttons">
           <button class="cancel-form-btn" name="cancel">Cancel</button>
@@ -186,6 +201,14 @@
 
         breedSelect.appendChild(option);
       });
+    });
+
+    document.getElementById('pet_image').addEventListener('change', function() {
+      const file = this.files[0];
+      if (file && !file.type.startsWith('image/')) {
+          alert("Please select an image file only.");
+          this.value = '';
+      }
     });
   </script>
   <script src="../scripts/navigation.js" defer></script>

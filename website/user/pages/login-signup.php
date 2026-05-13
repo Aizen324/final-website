@@ -48,6 +48,12 @@
           $_SESSION['user_name'] = $user['user_name'];
           $_SESSION['user_id'] = $user['user_id'];
           
+          $user_id = $_SESSION['user_id'];
+
+          $update_login = "UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE user_id = '$user_id'";
+
+          mysqli_query($connection, $update_login);
+
           header("Location: home.php");
           exit();
         } else {

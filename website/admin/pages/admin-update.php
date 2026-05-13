@@ -2,6 +2,7 @@
   if (session_status() === PHP_SESSION_NONE) {
       session_start();
   }
+
   include('../../database/database.php');
   
   if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
@@ -11,119 +12,78 @@
       header('Location: ../../user/html-pages/login.php?error=unauthorized');
       exit();
   }
+
   
-  function adoptionList($connection) {
+  function petList($connection) {
     $get_query = 
-      "SELECT a.adoption_id, a.pet_name, a.age, a.type, a.breed, a.gender, a.pet_desc, a.owner_name, a.contact_no, a.adoption_status, a.date_listed, u.user_name 
-      FROM adoption_listings a
-      LEFT JOIN users u ON a.user_id = u.user_id";
+      "SELECT pet_id, pet_name, age, type, breed, gender, pet_desc, reason, status, created, updated, user_name
+      FROM pet_profile p
+      LEFT JOIN users u ON p.user_id = u.user_id
+      ORDER BY p.status DESC";
     $result = mysqli_query($connection, $get_query);
     
     if ($result && mysqli_num_rows($result) > 0) {
       while ($row = mysqli_fetch_assoc($result)) {
         echo "
-          <div class='row update'>
-            <p>{$row['owner_name']}</p>
-            <p>{$row['pet_name']}</p>
-            <p>{$row['age']}</p>
-            <p>{$row['type']}</p>
-            <p>{$row['breed']}</p>
-            <p>{$row['gender']}</p>
-            <p class='pet_desc'>{$row['pet_desc']}</p>
-            <p>{$row['contact_no']}</p>
-            <p>{$row['adoption_status']}</p>
-            <p>{$row['date_listed']}</p>
+          <div class='row pet-update'>
+            <p>{$row['status']}</p>
             <p>{$row['user_name']}</p>
-            <button class='adopt-update-btn' 
-              data-id='{$row['adoption_id']}'
-              data-name='{$row['pet_name']}'
-              data-age='{$row['age']}'
-              data-type='{$row['type']}'
-              data-breed='{$row['breed']}'
-              data-gender='{$row['gender']}'
-              data-desc=\"{$row['pet_desc']}\"
-              data-contact='{$row['contact_no']}'
-              data-status='{$row['adoption_status']}'>
-                Update
-            </button>
-          </div>
-        ";
-      }
-    }
-  }
-
-  function rehomingList($connection) {
-    $get_query = "SELECT * FROM rehoming_listings";
-    $result = mysqli_query($connection, $get_query);
-
-    if ($result && mysqli_num_rows($result) >  0) {
-      while ($row = mysqli_fetch_assoc($result)) {
-        echo "
-          <div class='row'>
+            <p>{$row['pet_id']}</p>
             <p>{$row['pet_name']}</p>
             <p>{$row['age']}</p>
             <p>{$row['type']}</p>
-            <p>{$row['gender']}</p>
             <p>{$row['breed']}</p>
+            <p>{$row['gender']}</p>
             <p class='pet_desc'>{$row['pet_desc']}</p>
-            <p>{$row['rehoming_status']}</p>
-            <p>{$row['owner_name']}</p>
-            <p>{$row['contact_no']}</p>
-            <p class='reason'>{$row['reason']}</p>
-            <p>{$row['time_listed']}</p>
-            <button class='rehome-update-btn'
-              data-id = '{$row['rehoming_id']}'
+            <p class='pet_desc'>{$row['reason']}</p>
+            <p>{$row['created']}</p>
+            <p>{$row['updated']}</p>
+            <button class='update-btn'
+              data-id = '{$row['pet_id']}'
               data-name = '{$row['pet_name']}'
               data-age = '{$row['age']}'
               data-type = '{$row['type']}'
               data-gender = '{$row['gender']}'
               data-breed = '{$row['breed']}'
-              data-status = '{$row['rehoming_status']}'>
-              Update
-            </button>
+              data-status = '{$row['status']}'
+              data-desc = '{$row['pet_desc']}'
+              data-reason = '{$row['reason']}'>
+               Update
+             </button>
           </div>
         ";
       }
     }
   }
 
-  // Adoption Update
-  if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['adopt-save-btn'])) {
-    $adoption_id = $_POST['adoption_id'];
-    $pet_name = filter_input(INPUT_POST, 'pet_name', FILTER_SANITIZE_SPECIAL_CHARS);
+  // Pet Update
+  if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save-btn'])) {
+    $id = $_POST['pet_id'];
+    $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS);
     $age = filter_input(INPUT_POST, 'age', FILTER_SANITIZE_SPECIAL_CHARS);
     $type = filter_input(INPUT_POST, 'type', FILTER_SANITIZE_SPECIAL_CHARS);
-    $breed = filter_input(INPUT_POST, 'breed', FILTER_SANITIZE_SPECIAL_CHARS);
     $gender = filter_input(INPUT_POST, 'gender', FILTER_SANITIZE_SPECIAL_CHARS);
-    $pet_desc = filter_input(INPUT_POST, 'pet_desc', FILTER_SANITIZE_SPECIAL_CHARS);
-    $contact = filter_input(INPUT_POST, 'contact', FILTER_SANITIZE_SPECIAL_CHARS);
+    $breed = filter_input(INPUT_POST, 'breed', FILTER_SANITIZE_SPECIAL_CHARS);
     $status = filter_input(INPUT_POST, 'status', FILTER_SANITIZE_SPECIAL_CHARS);
+    $pet_desc = $_POST['pet_desc'];
+    $reason = $_POST['reason'];
+    $user_id = $_SESSION['user_id'];
+    $user_name = $_SESSION['user_name'];
 
     $update_query = 
-      "UPDATE adoption_listings 
-       SET pet_name='$pet_name', age='$age', type='$type', breed='$breed', gender='$gender', pet_desc='$pet_desc', contact_no='$contact', adoption_status='$status'
-       WHERE adoption_id = '$adoption_id';";
+      "UPDATE pet_profile
+       SET pet_name='$name', age='$age', type='$type', gender='$gender', breed='$breed', status='$status', pet_desc='$pet_desc', reason='$reason'
+       WHERE pet_id = '$id'"; 
     mysqli_query($connection, $update_query);
 
-    header('Location: admin-update.php');
-    exit();
-  }
+    // ADD TRANSACTION
+    $details = mysqli_real_escape_string($connection, "$user_name updated the information for pet $name ($id).");
 
-  // Rehoming Update
-  if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['rehome-save-btn'])) {
-    $id = $_POST['rehoming_id'];
-    $name = filter_input(INPUT_POST, 'name-rehome', FILTER_SANITIZE_SPECIAL_CHARS);
-    $age = filter_input(INPUT_POST, 'age-rehome', FILTER_SANITIZE_SPECIAL_CHARS);
-    $type = filter_input(INPUT_POST, 'type-rehome', FILTER_SANITIZE_SPECIAL_CHARS);
-    $gender = filter_input(INPUT_POST, 'gender-rehome', FILTER_SANITIZE_SPECIAL_CHARS);
-    $breed = filter_input(INPUT_POST, 'breed-rehome', FILTER_SANITIZE_SPECIAL_CHARS);
-    $status = filter_input(INPUT_POST, 'status-rehome', FILTER_SANITIZE_SPECIAL_CHARS);
-
-    $update_query = 
-      "UPDATE rehoming_listings
-       SET pet_name='$name', age='$age', type='$type', gender='$gender', breed='$breed', rehoming_status='$status'
-       WHERE rehoming_id = '$id'"; 
-    mysqli_query($connection, $update_query);
+    $transac_query = 
+      "INSERT INTO transactions (user_id, pet_id, trans_type, trans_details, category)
+      VALUES ('$user_id', '$id', 'Pet update', '$details', 'Pet')";
+      
+    mysqli_query($connection, $transac_query);
 
     header('Location: admin-update.php');
     exit();
@@ -141,87 +101,29 @@
   <title>Update | Tailmates</title>
 </head>
 <body>
-  <!-- Adoption Update Modal -->
-  <div class="adoption-modal-overlay">
+  <!-- Pet Update Modal -->
+  <div class="modal-overlay">
     <div class="update-modal">
       <div class="close-btn">&#10006;</div>
-      <h3>Update Adoption List</h3>
+      <h3>Update Pet Profile</h3>
       <div class="modal-info">
-        <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="post">
-          <input type="hidden" name="adoption_id" id="updateId">
+        <form action="" method="post">
+          <input type="hidden" name="pet_id" id="id">
           <div>
             <label>Pet Name <img src="../../icons/edit-icon.png" alt="edit-icon" class="edit-icon"></label>
-            <input type="text" name="pet_name" id="updateName">
+            <input type="text" name="name" id="name">
           </div>
           <div>
             <label>Age <img src="../../icons/edit-icon.png" alt="edit-icon" class="edit-icon"></label>
-            <input type="text" name="age" id="updateAge">
+            <input type="text" name="age" id="age">
           </div>
           <div>
             <label>Type <img src="../../icons/edit-icon.png" alt="edit-icon" class="edit-icon"></label>
-            <input type="text" name="type" id="updateType">
-          </div>
-          <div>
-            <label>Breed <img src="../../icons/edit-icon.png" alt="edit-icon" class="edit-icon"></label>
-            <input type="text" name="breed" id="updateBreed">
+            <input type="text" name="type" id="type">
           </div>
           <div>
             <label>Gender <img src="../../icons/edit-icon.png" alt="edit-icon" class="edit-icon"></label>
-            <select name="gender" id="updateGender">
-              <option value="" disabled selected>Select gender</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-            </select>
-          </div>
-          <div>
-            <label>Pet Description <img src="../../icons/edit-icon.png" alt="edit-icon" class="edit-icon"></label>
-            <textarea name="pet_desc" id="updateDesc"></textarea>
-          </div>
-          <div>
-            <label>Contact Number <img src="../../icons/edit-icon.png" alt="edit-icon" class="edit-icon"></label>
-            <input type="text" name="contact" id="updateContact">
-          </div>
-          <div>
-            <label>Status <img src="../../icons/edit-icon.png" alt="edit-icon" class="edit-icon"></label>
-            <select name="status" id="updateStatus">
-              <option value="" disabled selected>Select status</option>
-              <option value="Available">Available</option>
-              <option value="Adopted">Adopted</option>
-            </select>
-          </div>
-
-          <div class="modal-action">
-            <button type="submit" name="adopt-save-btn">Save Changes</button>
-            <button type="button" class="cancel-btn">Cancel</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Rehoming Update Modal -->
-  <div class="rehome-modal-overlay">
-    <div class="update-modal">
-      <div class="close-btn">&#10006;</div>
-      <h3>Update Rehoming List</h3>
-      <div class="modal-info">
-        <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="post">
-          <input type="hidden" name="rehoming_id" id="rId">
-          <div>
-            <label>Pet Name <img src="../../icons/edit-icon.png" alt="edit-icon" class="edit-icon"></label>
-            <input type="text" name="name-rehome" id="rName">
-          </div>
-          <div>
-            <label>Age <img src="../../icons/edit-icon.png" alt="edit-icon" class="edit-icon"></label>
-            <input type="text" name="age-rehome" id="rAge">
-          </div>
-          <div>
-            <label>Type <img src="../../icons/edit-icon.png" alt="edit-icon" class="edit-icon"></label>
-            <input type="text" name="type-rehome" id="rType">
-          </div>
-          <div>
-            <label>Gender <img src="../../icons/edit-icon.png" alt="edit-icon" class="edit-icon"></label>
-            <select name="gender-rehome" id="rGender">
+            <select name="gender" id="gender">
               <option value="" disabled selected>Select gender</option>
               <option value="male">Male</option>
               <option value="female">Female</option>
@@ -229,19 +131,29 @@
           </div>
           <div>
             <label>Breed <img src="../../icons/edit-icon.png" alt="edit-icon" class="edit-icon"></label>
-            <input type="text" name="breed-rehome" id="rBreed">
+            <input type="text" name="breed" id="breed">
           </div>
           <div>
             <label>Status <img src="../../icons/edit-icon.png" alt="edit-icon" class="edit-icon"></label>
-            <select name="status-rehome" id="rStatus">
+            <select name="status" id="status">
               <option value="" disabled selected>Select status</option>
-              <option value="Unverified">Unverified</option>
-              <option value="Verified">Verified</option>
+              <option value="For rehoming">For rehoming</option>
+              <option value="For adoption">For adoption</option>
+              <option value="Adopted">Adopted</option>
+              <option value="Deceased">Deceased</option>
             </select>
+          </div>
+          <div>
+            <label>Pet Description <img src="../../icons/edit-icon.png" alt="edit-icon" class="edit-icon"></label>
+            <textarea name="pet_desc" id="desc"></textarea>
+          </div>
+          <div>
+            <label>Reason <img src="../../icons/edit-icon.png" alt="edit-icon" class="edit-icon"></label>
+            <textarea name="reason" id="reason"></textarea>
           </div>
 
           <div class="modal-action">
-            <button type="submit" name="rehome-save-btn">Save Changes</button>
+            <button type="submit" name="save-btn">Save Changes</button>
             <button type="button" class="cancel-btn">Cancel</button>
           </div>
         </form>
@@ -306,33 +218,34 @@
   </nav>
 
   <main>
-    <!-- ADOPTION TABLE -->
+    <!-- PET TABLE -->
     <section class="section-1">
-      <div class="adoption-wrapper">
-        <h2>Adoption Listings Table</h2>
+      <div class="table-wrapper">
+        <h2>Pet Table</h2>
         <div class="table-scroll">
-          <div class="adoption-table">
-            <div class="row update">
+          <div class="table">
+            <div class="row pet-update">
+              <p>Status</p>
               <p>Owner</p>
+              <p>Pet Number</p>
               <p>Pet Name</p>
               <p>Age</p>
               <p>Type</p>
               <p>Breed</p>
               <p>Gender</p>
               <p>Pet Description</p>
-              <p>Contact</p>
-              <p>Status</p>
-              <p>Date Listed</p>
-              <p>Administrator</p>
+              <p>Reason</p>
+              <p>Date Created</p>
+              <p>Date Updated</p>
               <p></p>
             </div>
-              <?php adoptionList($connection); ?>
-            </div>
+            <?php petList($connection); ?>
           </div>
         </div>
+      </div>
     </section>
 
-    <!-- REHOMING TABLE -->
+    <!-- REHOMING TABLE
     <section class="section-2">
       <div class="rehoming-wrapper">
         <h2>Rehoming Listings Table</h2>
@@ -352,44 +265,42 @@
               <p>Time Listed</p>
               <p></p>
             </div>
-            <?php rehomingList($connection) ?>
+            <?php // rehomingList($connection) ?>
           </div>
         </div>
       </div>
-    </section>
+    </section> -->
   </main>
 
 
   <script defer>
-    const adoptionModal = document.querySelectorAll('.adopt-update-btn');
-    const rehomingModal = document.querySelectorAll('.rehome-update-btn');
-    const adoptionOverlay = document.querySelector('.adoption-modal-overlay');
-    const rehomingOverlay = document.querySelector('.rehome-modal-overlay');
+    const modal = document.querySelectorAll('.update-btn');
+    const overlay = document.querySelector('.modal-overlay');
     const closeModal = document.querySelectorAll('.close-btn'); // x button
     const cancelBtn = document.querySelectorAll('.cancel-btn'); // cancel button
 
-    // Inputs Data (Adoption)
-    const id = document.getElementById('updateId');
-    const name = document.getElementById('updateName');
-    const age = document.getElementById('updateAge');
-    const type = document.getElementById('updateType');
-    const breed = document.getElementById('updateBreed');
-    const gender = document.getElementById('updateGender');
-    const desc = document.getElementById('updateDesc');
-    const contact = document.getElementById('updateContact');
-    const status = document.getElementById('updateStatus');
+    // Pet Data (Adoption)
+    const id = document.getElementById('id');
+    const name = document.getElementById('name');
+    const age = document.getElementById('age');
+    const type = document.getElementById('type');
+    const gender = document.getElementById('gender');
+    const breed = document.getElementById('breed');
+    const status = document.getElementById('status');
+    const desc = document.getElementById('desc');
+    const reason = document.getElementById('reason');
     
     // Inputs Data (Rehoming)
-    const r_id = document.getElementById('rId');
-    const r_name = document.getElementById('rName');
-    const r_age = document.getElementById('rAge');
-    const r_type = document.getElementById('rType');
-    const r_gender = document.getElementById('rGender');
-    const r_breed = document.getElementById('rBreed');
-    const r_status = document.getElementById('rStatus');
+    // const r_id = document.getElementById('rId');
+    // const r_name = document.getElementById('rName');
+    // const r_age = document.getElementById('rAge');
+    // const r_type = document.getElementById('rType');
+    // const r_gender = document.getElementById('rGender');
+    // const r_breed = document.getElementById('rBreed');
+    // const r_status = document.getElementById('rStatus');
 
     // Event Listeners
-    adoptionModal.forEach(btn => {
+    modal.forEach(btn => {
       btn.addEventListener('click', () => {
         id.value = btn.dataset.id;
         name.value = btn.dataset.name;
@@ -397,38 +308,36 @@
         type.value = btn.dataset.type;
         breed.value = btn.dataset.breed;
         gender.value = btn.dataset.gender;
-        desc.value = btn.dataset.desc;
-        contact.value = btn.dataset.contact;
         status.value = btn.dataset.status;
+        desc.value = btn.dataset.desc;
+        reason.value = btn.dataset.reason;
 
-        adoptionOverlay.style.display = 'flex';
+        overlay.style.display = 'flex';
       });
     })
-    rehomingModal.forEach(btn => {
-      btn.addEventListener('click', () => {
-        r_id.value = btn.dataset.id;
-        r_name.value = btn.dataset.name;
-        r_age.value = btn.dataset.age;
-        r_type.value = btn.dataset.type;
-        r_gender.value = btn.dataset.gender;
-        r_breed.value = btn.dataset.breed;
-        r_status.value = btn.dataset.status;
+    // rehomingModal.forEach(btn => {
+    //   btn.addEventListener('click', () => {
+    //     r_id.value = btn.dataset.id;
+    //     r_name.value = btn.dataset.name;
+    //     r_age.value = btn.dataset.age;
+    //     r_type.value = btn.dataset.type;
+    //     r_gender.value = btn.dataset.gender;
+    //     r_breed.value = btn.dataset.breed;
+    //     r_status.value = btn.dataset.status;
 
-        rehomingOverlay.style.display = 'flex';
-      });
-    });
+    //     rehomingOverlay.style.display = 'flex';
+    //   });
+    // });
 
     closeModal.forEach(btn => {
       btn.addEventListener('click', () => {
-        adoptionOverlay.style.display = 'none';
-        rehomingOverlay.style.display = 'none';
+        overlay.style.display = 'none';
       });
     })
 
     cancelBtn.forEach(btn => {
       btn.addEventListener('click', () => {
-        adoptionOverlay.style.display = 'none';
-        rehomingOverlay.style.display = 'none';
+        overlay.style.display = 'none';
       });
     });
 

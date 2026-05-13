@@ -49,7 +49,7 @@ input:focus {
 /* SECTION 2 (FORM) */
 form {
   padding-top: 5vh;
-  height: 180vh;
+  height: 150vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -63,11 +63,37 @@ form {
   span {
     color: #ff0000;
   }
+  #pet-description {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  #help-icon {
+    margin-left: 10px;
+    width: 25px;
+    cursor: pointer;
+  }
+  .tooltipText {
+    display: none;
+    position: absolute;
+    left: 14%;
+    background-color: var(--shadow-clr);
+    color: var(--white-clr);
+    border-radius: 20px;
+    padding: 8px 12px;
+    margin-top: 25px;
+    filter: blur(2);
+    width: 30%;
+  }
+  #help-icon:hover + .tooltipText {
+    display: block;
+  }
 
   .form1-container,
   .form2-container {
     width: 90%;
-    height: 100vh;
+    height: 120vh;
     background-color: var(--white-clr);
     box-shadow: 2px 3px 10px var(--shadow-clr);
     border-radius: 10px;
@@ -100,18 +126,18 @@ form {
     
   }
   .form1-container .wrapper:nth-child(8),
-  .form2-container .wrapper:nth-child(4) {
+  .form1-container .wrapper:nth-child(9) {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
   .form1-container .wrapper:nth-child(8) p,
-  .form2-container .wrapper:nth-child(4) p {
+  .form1-container .wrapper:nth-child(9) p {
     width: 100%;
   }
   .form1-container .wrapper:nth-child(8) textarea,
-  .form2-container .wrapper:nth-child(4) textarea {
+  .form1-container .wrapper:nth-child(9) textarea {
     width: 100%;
     height: 150px;
     padding: 20px;

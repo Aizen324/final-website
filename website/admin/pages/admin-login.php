@@ -4,10 +4,10 @@
 
   try {
     if (isset($_POST['login'])) {
-      $email = mysqli_real_escape_string($connection, $_POST['email']);
+      $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
       $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_SPECIAL_CHARS);
 
-      $read_sql = "SELECT * FROM users WHERE role = 'admin';";
+      $read_sql = "SELECT * FROM users WHERE user_email = '$email' AND role = 'admin'";
       $result = mysqli_query($connection, $read_sql);
       
       if ($result && mysqli_num_rows($result) > 0) {
@@ -16,12 +16,21 @@
         if ($password === $admin_user['user_password']) {
           $_SESSION['role'] = $admin_user['role'];
           $_SESSION['user_id'] = $admin_user['user_id'];
+          $_SESSION['user_name'] = $admin_user['user_name'];
           
+          $admin_id = $_SESSION['user_id'];
+
+          $update_login = "UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE user_id = '$admin_id'";
+
+          mysqli_query($connection, $update_login);
+
           header('Location: admin-dashboard.php');
           exit();
         } else {
           echo "<script>alert('Invalid username or password.')</script>";
         }
+      } else {
+        echo "<script>alert('Admin does not exist.')</script>";
       }
     }
   } catch (mysqli_sql_exception) {}

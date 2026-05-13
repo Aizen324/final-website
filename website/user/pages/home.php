@@ -38,6 +38,10 @@
           <img src="../../icons/settings-icon.png" alt="settings-icon">
           <p>Settings and Privacy</p>
         </div>
+        <a href="adopted-animals.php">
+          <img src="../../icons/cat-icon.png" alt="cat-icon">
+          <p>See Adopted Pets</p>
+        </a>
         <a href="../../database/logout.php" class="logout" name="logout">
           <img src="../../icons/logout-icon.png" alt="logout-icon">
           <p>Logout</p>
@@ -45,7 +49,7 @@
       </div>
     </div>
   </div>
-
+  
   <!-- Navigation -->
   <nav>
     <div class="navigation-wrapper">
